@@ -48,9 +48,9 @@
                                                 <ng-template #showTitle>{{item.prompt}}</ng-template>
                                         </div>
                                         <ng-template #editingItem>
-                                            <div>
+                                            
                                                     <input type="text" name="item" class="item-edit" [(ngModel)]="itemPrompt" placeholder="{{item.title}} (keyup.enter)="addItem()">
-                                            </div>
+                                            
                                         </ng-template>
                                         <div class="item-right" (click)="deleteItem(item.id)">(X)</div>
                                     </div>

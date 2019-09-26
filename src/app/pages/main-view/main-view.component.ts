@@ -14,7 +14,8 @@ export class MainViewComponent implements OnInit {
   template ="Template";
   boardMain = "Board";
   componentsTitle = "Components";
-  itemPrompt;
+  itemPrompt: string;
+  idForBoard: number;
 
 
 
