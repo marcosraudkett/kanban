@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700,900|Nunito:400,700&display=swap');
+
+$family-sans-serif: "Nunito", sans-serif; 
+
+//update component variables
+$control-border-width: 2px;
+$input-border-color: transparent;
+$input-shadow: none;
+
+/* set global styles */
+
+html, body {
+    height: 100%;
+}
+html{
+    background-image: url("./assets/triangles-download.png");
+    background-size: cover;
+    overflow-y: auto !important;
+}

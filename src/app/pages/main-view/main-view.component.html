@@ -1,0 +1,81 @@
+<div class="root" >
+    <div class="navbar has-background-dark">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <h1 class="app-name has-gradient-text">Kanban</h1>
+            </div>
+        </div>
+    </div>
+    <div class="board">
+        <div class="board-bar">
+            <p class="board-name">Board Name</p>
+        </div>
+        <div class="board-wrapper" >
+            <div class="board-columns" cdkDropListGroup>
+                <div class="board-column-template"
+                    cdkDropList
+                    #todoList="cdkDropList"
+                    [cdkDropListData]="todo"
+                    (cdkDropListDropped)="drop($event)"
+                    >
+                    <div class="column-title">
+                            {{template}}
+                    </div>
+                    <div class="tasks-container"
+                        
+                    >
+                        <div class="task" *ngFor="let item of todo" cdkDrag>
+                            {{item}}
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="board-column-main"
+                    cdkDropList
+                    [cdkDropListData]="board"
+                    #doneList="cdkDropList"
+                    (cdkDropListDropped)="drop($event)">
+                    <div class="column-title">
+                            {{boardMain}}
+                    </div>
+                    <div class="items-container">
+                            <div class="tasks-container">
+                                    <div class="task" *ngFor="let item of board" cdkDrag>
+                                        <div class="item-left">(0)</div>
+                                        <div *ngIf="!item.editing; else editingItem" class="item-label"
+                                        (dblclick)="editItem(item)" >
+                                                <div *ngIf="!item.prompt; else showTitle">{{item.title}}</div>
+                                                <ng-template #showTitle>{{item.prompt}}</ng-template>
+                                        </div>
+                                        <ng-template #editingItem>
+                                            <div>
+                                                    <input type="text" name="item" class="item-edit" [(ngModel)]="itemPrompt" placeholder="{{item.title}} (keyup.enter)="addItem()">
+                                            </div>
+                                        </ng-template>
+                                        <div class="item-right" (click)="deleteItem(item.id)">(X)</div>
+                                    </div>
+                                </div>
+                    </div>
+                    
+                </div>
+                <div class="board-column-components"
+                    cdkDropList
+                    [cdkDropListData]="components"
+                    #componentsList="cdkDropList"
+                    [cdkDropListEnterPredicate]="noReturnPredicate"
+                    (cdkDropListDropped)="drop($event)">
+                    <div class="column-title">
+                            {{componentsTitle}}
+                    </div>
+                    <div class="tasks-container"
+                        
+                    >
+                        <div class="task" *ngFor="let item of components" cdkDrag>
+                            {{item.title}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
