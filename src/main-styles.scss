@@ -13,7 +13,8 @@ html, body {
     height: 100%;
 }
 html{
-    background-image: url("./assets/triangles-download.png");
+    /*background-image: url("./assets/triangles-download.png");*/
+    background: gainsboro !important;
     background-size: cover;
     overflow-y: auto !important;
 }
