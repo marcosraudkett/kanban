@@ -37,8 +37,11 @@
 }
 
 .property-input {
-    width: 90px !important;
+    width: 110px !important;
     float: right !important;
+    background: #333333;
+    border: 0px solid;
+    color: white;
 }
 
 .property-group {
@@ -241,6 +244,9 @@
                 }
                 
                 
+            }
+            .board-container-text {
+                text-align: center;
             }
             .board-column-hierarchy {
                 display: flex;

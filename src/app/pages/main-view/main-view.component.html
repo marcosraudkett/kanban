@@ -8,17 +8,17 @@
                 [cdkDropListEnterPredicate]="noReturnPredicate"
                 (cdkDropListDropped)="drop($event)">
                 <div class="tasks-container">
-                    <p class="board-name">{{workspaceTitle}}</p>
+                    <p matTooltip="Project: {{workspaceTitleFull}}" class="board-name">{{workspaceTitle}}</p>
                     
                     <ul class="menu">
-                        <li class="menu-item" (click)="toggleNewFormModal()"><a class="color-1" href="#">New</a></li>
-                        <li class="menu-item" (click)="toggleOpenFormModal()"><a href="#">Open</a></li>
-                        <li class="menu-item" (click)="saveForm()" *ngIf="workspaceTitle !== 'FlowCatalyst'"><a href="#">Save</a></li>
-                        <li class="menu-item" (click)="toggleExportFormModal()" *ngIf="workspaceTitle !== 'FlowCatalyst'"><a href="#">Export</a></li>
+                        <li matTooltip="Create a new form" class="menu-item" (click)="toggleNewFormModal()"><a class="color-1" href="#">New</a></li>
+                        <li matTooltip="Open a form" class="menu-item" (click)="toggleOpenFormModal()"><a href="#">Open</a></li>
+                        <li matTooltip="Save the current form" class="menu-item" (click)="saveForm()" *ngIf="workspaceTitle !== 'FlowCatalyst'"><a href="#">Save</a></li>
+                        <li matTooltip="Export form" class="menu-item" (click)="toggleExportFormModal()" *ngIf="workspaceTitle !== 'FlowCatalyst'"><a href="#">Export</a></li>
                         <li class="menu-item has-submenu" *ngIf="workspaceTitle !== 'FlowCatalyst'"> Misc
                             <ul class="sub-menu">
-                                <li class="sub-menu-item"><a href="#">Preview</a></li>
-                                <li class="sub-menu-item" (click)="toggleSettingsModal()"><a href="#">Settings</a></li>
+                                <li matTooltip="Preview the current form" class="sub-menu-item"><a href="#">Preview</a></li>
+                                <li matTooltip="Workspace settings" class="sub-menu-item" (click)="toggleSettingsModal()"><a href="#">Settings</a></li>
                                 <li class="sub-menu-item" (click)="closeForm()"><a href="#">Close Form</a></li>
                                 <hr>
                                 <li class="sub-menu-item" (click)="toggleDeleteFormModal()"><a class="text-danger" href="#">Delete Form</a></li>
@@ -67,13 +67,14 @@
                     <div class="column-title">
                             {{boardMain}}
                     <span class="is-pulled-right board-right-items">
-                        <a href="#" title="Undo changes">Undo</a>&nbsp;
-                        <a href="#" title="Redo changes">Redo</a>&nbsp;
-                        <a href="#" title="Edit code">< / ></a>
+                        <a matTooltip="Undo changes" href="#">Undo</a>&nbsp;
+                        <a matTooltip="Redo changes" href="#">Redo</a>&nbsp;
+                        <a matTooltip="Edit code" href="#">< / ></a>
                     </span>
                     </div>
                     <div class="items-container">
                         <div class="tasks-container">
+                            <p *ngIf="board.length == 0" class="board-container-text">You can add new elements to your board by dragging them from the top menu.</p>
                             <div class="task" [ngClass]="{'color-bg-1': id === item.id }" *ngFor="let item of board" (click)="loadProperties(item.id, $event)" id="{{item.id}}" cdkDrag>
                                 <div class="item-left">(0)</div>
                                 <div *ngIf="!item.editing; else editingItem" class="item-label"
@@ -104,11 +105,11 @@
                             <div class="properites" *ngFor="let property of properties">
                                 <div class="input-group property-group">
                                     {{property.title}}: 
-                                    <input id="{{property.title}}" class="form-control property-input" type="text" placeholder="" value="{{property.value}}">
+                                    <input id="{{property.title}}" class="form-control property-input" type="text" placeholder="{{property.title}}" value="{{property.value}}">
                                 </div>
                             </div>
                         </span>
-                        <button class="button is-color-1 btn-block btn-properties" [attr.disabled]="!componentTitle ? !componentTitle : null"  (click)="saveProperties()">Save Properties</button>
+                        <button matTooltip="Save current element properties." class="button is-color-1 btn-block btn-properties" [attr.disabled]="!componentTitle ? !componentTitle : null"  (click)="saveProperties()">Save Properties</button>
                         <!--
                         -->
                     </div>

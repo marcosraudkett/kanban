@@ -8,6 +8,8 @@ import { FormDatabaseService } from '../../services/form-database.service'
 import { CookieService } from '../../services/cookie.service'
 import { cloneDeep } from 'lodash';
 
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 
 @Component({
   selector: 'app-main-view',
@@ -42,6 +44,7 @@ export class MainViewComponent implements OnInit {
   idList=[];
 
   workspaceTitle = "FlowCatalyst"
+  workspaceTitleFull = "FlowCatalyst"
   formTitle: string;
   formId: string;
   formData: object[];
@@ -68,7 +71,8 @@ export class MainViewComponent implements OnInit {
     private elementDataBase: ElementDatabaseService, 
     private formDataBase: FormDatabaseService, 
     public Cookies: CookieService, 
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    public _snackBar: MatSnackBar
   ) { }
 
   ngOnInit() {
@@ -181,7 +185,6 @@ export class MainViewComponent implements OnInit {
 
   /* for loading properties */
   loadProperties(id:number, item: CdkDragDrop<string[]>, event) {
-    console.log(item);
     this.properties = [];
     this.component = this.board.filter(
           board => board.id === id);
@@ -197,13 +200,13 @@ export class MainViewComponent implements OnInit {
              && key != 'main')
           {
             this.properties.push(
-              {title: key,value: obj[key]}
+              { title: key, value: obj[key] }
             )
           }
         }
     }
     
-    console.log(this.component);
+    console.log("loadProperties: " + this.component);
   }
 
   /* saves the board item settings 
@@ -223,20 +226,31 @@ export class MainViewComponent implements OnInit {
           }
         }
     }
+    this.notification("Properties saved.", "", 2000);
     this.refreshHierarchy();
   }
 
-  /* refreshes the hierarchy */
+  /**
+   * refreshes the hierarchy 
+   * 
+   */ 
   refreshHierarchy() {
     this.hierarchyItems = [];
     for(this.i=0; this.i<this.board.length;this.i++){
       this.hierarchyItems.push(
-        {title:this.board[this.i]['title'],id:this.board[this.i]['id'],default:this.board[this.i]['default']}
+        {
+          title:this.board[this.i]['title'],
+          id:this.board[this.i]['id'],
+          default:this.board[this.i]['default']
+        }
       )
     }
   }
 
-  /* refreshes the properties */
+  /**
+   * refreshes the properties 
+   * 
+   */ 
   refreshProperties() {
     if(this.board.length != 0)
     {
@@ -253,7 +267,10 @@ export class MainViewComponent implements OnInit {
     this.componentTitle = null;
   }
 
-  /* called after creating or loading a form. */
+  /**
+   * called after creating or opening a form.
+   * 
+   */ 
   initializeWorkspace() {
     var newDate = new Date();
     if (this.isComponentsLoaded == false) {
@@ -277,6 +294,7 @@ export class MainViewComponent implements OnInit {
     this.lockerVisible = true;
     this.lastSavedVisible = false;
     this.workspaceTitle = "FlowCatalyst";
+    this.workspaceTitleFull = "FlowCatalyst";
     this.loadForms();
   }
 
@@ -294,6 +312,7 @@ export class MainViewComponent implements OnInit {
     console.log(this.Cookies.getCookie("autoSaveInterval"));
     console.log(this.Cookies.getCookie("autoSave"));
     this.toggleSettingsModal();
+    this.notification("Settings saved.", "", 2000);
   }
 
   closeForm(): void {
@@ -301,7 +320,10 @@ export class MainViewComponent implements OnInit {
     this.destroyWorkspace();
   }
 
-  /* delete currently active/open form */
+  /**
+   * Delete currently active form via Delete form modal
+   * 
+   */ 
   deleteActiveForm(): void {
     this.formId = this.Cookies.getCookie("form_id");
     this.formDataBase.deleteForm(this.formId).then((data:any) => {
@@ -314,7 +336,10 @@ export class MainViewComponent implements OnInit {
     });
   }
 
-  /* loads all forms */
+  /**
+   * Loads all forms
+   * 
+   */ 
   loadForms(): void {
     this.selectFormTitles = [];
     this.formDataBase.loadForms().then((data:any) => {
@@ -330,7 +355,11 @@ export class MainViewComponent implements OnInit {
     });
   }
 
-  /* for saving forms */
+  /**
+   * Save form
+   * Gets the currently open form via cookie form_id and saves it to the database.
+   * 
+   */ 
   saveForm(): void {
     this.formId = this.Cookies.getCookie("form_id");
     this.formData = JSON.stringify(this.board);
@@ -341,12 +370,16 @@ export class MainViewComponent implements OnInit {
           let newDate = new Date();
           console.log("Saved. at: " + this.datePipe.transform(newDate, 'HH:mm'));
           this.lastSaved = "Saved. (Today "+ this.datePipe.transform(newDate, 'HH:mm') +")";
+          this.notification("Form saved.", "", 2000);
         }
       });
     }
   }
 
-  /* loads form data (board contents) and updates current board contents */
+  /**
+   * Loads form data (board contents) and updates current board contents
+   * 
+   */ 
   loadFormData(formId): void {
     this.formDataBase.loadFormData(formId).then((data:any) => {
       if(data)
@@ -374,13 +407,18 @@ export class MainViewComponent implements OnInit {
     });
   }
 
-  /* open form */
+  /**
+   * Open form via Open form modal (selects form id from the dropdownlist)
+   * 
+   */ 
   openForm(): void {
     this.formDataBase.loadForm(this.openFormDropdown).then((data:any) => {
       if(data)
       {
         this.formTitle = data['data']['title'];
         this.workspaceTitle = data['data']['title'];
+        this.workspaceTitleFull = data['data']['title'];
+        this.workspaceTitle.length >= 15 ? this.workspaceTitle = this.workspaceTitle.substr(0, 15) + '...' : this.workspaceTitle = this.workspaceTitle;
         this.Cookies.setCookie("form_id", this.openFormDropdown, 1, "/");
         this.loadFormData(this.openFormDropdown);
         this.initializeWorkspace();
@@ -390,13 +428,18 @@ export class MainViewComponent implements OnInit {
     });
   }
 
-  /* for loading/opening forms */
+  /**
+   * For loading previously created forms
+   * 
+   */ 
   loadForm(formId): void {
     this.formDataBase.loadForm(this.formId).then((data:any) => {
       if(data)
       {
         this.formTitle = data['data']['title'];
         this.workspaceTitle = data['data']['title'];
+        this.workspaceTitleFull = data['data']['title'];
+        this.workspaceTitle.length >= 15 ? this.workspaceTitle = this.workspaceTitle.substr(0, 15) + '...' : this.workspaceTitle = this.workspaceTitle;
         this.Cookies.setCookie("form_id", this.formId, 1, "/");
         this.loadFormData(this.formId);
         this.initializeWorkspace();
@@ -404,7 +447,10 @@ export class MainViewComponent implements OnInit {
     });
   }
   
-  /* for creating forms */
+  /**
+   * Create a new form
+   * 
+   */ 
   createForm(): void {
     this.formId = this.formDataBase.newForm(this.formTitle).then((data:any) => {
     setTimeout(
@@ -414,6 +460,8 @@ export class MainViewComponent implements OnInit {
         this.formId = data['data']['_id'];
         this.formTitle = data['data']['title'];
         this.workspaceTitle = data['data']['title'];
+        this.workspaceTitleFull = data['data']['title'];
+        this.workspaceTitle.length >= 15 ? this.workspaceTitle = this.workspaceTitle.substr(0, 15) + '...' : this.workspaceTitle = this.workspaceTitle;
         this.board = [];
         /* setcookie to remember the form id */
         this.Cookies.setCookie("form_id", this.formId, 1, "/");
@@ -423,23 +471,28 @@ export class MainViewComponent implements OnInit {
     }, 2500)
   }
 
+  /**
+   * Export form
+   * 
+   */ 
   exportForm(): void {
     if(this.exportFormat == 'json')
     {  
       this.dyanmicDownloadByHtmlTag({
-        fileName: this.workspaceTitle + '.json',
+        fileName: this.workspaceTitleFull + '.json',
         text: JSON.stringify(this.board)
       });
     }
     if(this.exportFormat == 'xml')
     {  
-      this.dyanmicDownloadByHtmlTag({
-        fileName: this.workspaceTitle + '.xml',
-        text: JSON.stringify(this.board)
-      });
+      /* add XML download here */
     }
   }
 
+  /**
+   * JSON download
+   * 
+   */ 
   private dyanmicDownloadByHtmlTag(arg: {
     fileName: string,
     text: string
@@ -454,6 +507,12 @@ export class MainViewComponent implements OnInit {
 
     var event = new MouseEvent("click");
     element.dispatchEvent(event);
+  }
+
+  notification(message: string, action: string, duration: number): void {
+      this._snackBar.open(message, action, {
+        duration: duration,
+      });
   }
 
   closeNewFormModal() {
